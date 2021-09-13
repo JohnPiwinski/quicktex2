@@ -1,5 +1,4 @@
 function! quicktex#expand#ExpandWord(ft)
-    echo "Attempting Expand"
     " Get the current line up to the cursor position
     let line = strpart(getline('.'), 0, col('.')-1)
 
@@ -37,15 +36,13 @@ function! quicktex#expand#ExpandWord(ft)
 
     " Delete the original word, replace it with the result of the dictionary,
     " and jump back if needed.
-    echom("\<C-g>u".delword.result.jumpBack)
     return "\<C-g>u".delword.result.jumpBack
 endfunction
 
 let g:char_counter = 0
 
 function! quicktex#expand#AutoExpand()
-    echom "Expanding Math"
-    g:char_counter ++
+    g:char_counter += 1
     if g:char_counter % 5 == 0
         write
     endif
@@ -54,7 +51,6 @@ function! quicktex#expand#AutoExpand()
         let word = (line[-1:] == ' ') ? ' ' : split(line, '\s', 1)[-1]
         let word = split(word, join(g:quicktex_excludechar, '\|'), 1)[-1]
         let result = get(g:quicktex_math, word, '')
-        echom word." ".result
         let l:sub_len = strlen(word)
         if result == ''
             while l:sub_len > 1
@@ -65,13 +61,11 @@ function! quicktex#expand#AutoExpand()
                 endif
             endwhile
             if result == ''
-                echom "Empty result"
                 return ""
             endif
         endif
         let delword  = repeat("\<BS>", l:sub_len)
         let jumpBack = stridx(result,'<+++>')+1 ? "\<ESC>:call search('<+++>', 'b')\<CR>\"_cf>" : ''
-        echom "Auto Expand: \<C-g>u".delword.result.jumpBack
         call feedkeys("\<C-g>u".delword.result.jumpBack)
     endif
     redraw
