@@ -25,27 +25,22 @@ function! quicktex#expand#ExpandWord(ft)
     " If there is no result found in the dictionary, then return the original
     " trigger key.
     if result == ''
-        call feedkeys("\<ESC>:call silent! search('<+.*+>', 'b')\<CR>\"_c/+>/e\<CR>")
+        call feedkeys("\<ESC>:call search('<+.*+>', 'b')\<CR>\"_c/+>/e\<CR>")
         return get(g:, 'quicktex_trigger', '')
     endif
 
     " Create a string of backspaces to delete the last word, and also create a
     " string for jumping back to the identifier "<+++>" if it exists.
     let delword  = repeat("\<BS>", strlen(word))
-    let jumpBack = stridx(result,'<+++>')+1 ? "\<ESC>:call silent! search('<+++>', 'b')\<CR>\"_cf>" : ''
+    let jumpBack = stridx(result,'<+++>')+1 ? "\<ESC>:call search('<+++>', 'b')\<CR>\"_cf>" : ''
 
     " Delete the original word, replace it with the result of the dictionary,
     " and jump back if needed.
     return "\<C-g>u".delword.result.jumpBack
 endfunction
 
-let g:char_counter = 0
 
 function! quicktex#expand#AutoExpand()
-    g:char_counter += 1
-    if g:char_counter % 5 == 0
-        write
-    endif
     if quicktex#mathmode#InMathMode()
         let line = strpart(getline('.'), 0, col('.')-1)
         let word = (line[-1:] == ' ') ? ' ' : split(line, '\s', 1)[-1]
@@ -65,7 +60,7 @@ function! quicktex#expand#AutoExpand()
             endif
         endif
         let delword  = repeat("\<BS>", l:sub_len)
-        let jumpBack = stridx(result,'<+++>')+1 ? "\<ESC>:call silent! search('<+++>', 'b')\<CR>\"_cf>" : ''
+        let jumpBack = stridx(result,'<+++>')+1 ? "\<ESC>:call search('<+++>', 'b')\<CR>\"_cf>" : ''
         call feedkeys("\<C-g>u".delword.result.jumpBack)
     endif
     redraw
